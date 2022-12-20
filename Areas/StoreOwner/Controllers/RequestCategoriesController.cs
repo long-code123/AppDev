@@ -36,7 +36,7 @@ namespace AppDev.Areas.StoreOwner.Controllers
         {
             var requests = await _context.RequestCategories
                 .Where(r => r.StoreOwnerId == StoreOwnerId)
-                .OrderBy(r => r.IsAppproved)
+                .OrderBy(r => r.IsApproved)
                 .ThenBy(r => r.Id)
                 .ToListAsync();
 

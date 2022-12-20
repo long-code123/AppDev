@@ -21,7 +21,7 @@ namespace AppDev.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             var requests = await _context.RequestCategories
-                .OrderBy(r => r.IsAppproved)
+                .OrderBy(r => r.IsApproved)
                 .ThenByDescending(r => r.Id)
                 .ToListAsync();
 
@@ -76,7 +76,7 @@ namespace AppDev.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                if (requestCategory.IsAppproved == true)
+                if (requestCategory.IsApproved == true)
                 {
                     if (await _context.Categories.AnyAsync(c => c.Name == requestCategory.Name))
                     {

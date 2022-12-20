@@ -15,8 +15,8 @@ namespace AppDev.Models
 
         public string Name { get; set; } = null!;
 
-        [Display(Name = "Is Appproved")]    
-        public bool? IsAppproved { get; set; } = null;
+        [Display(Name = "Is Approved")]    
+        public bool? IsApproved { get; set; } = null;
 
         [StringLength(255)]
         public string Message { get; set; } = "";
@@ -25,14 +25,14 @@ namespace AppDev.Models
         {
             if (storeOwnerId != this.StoreOwnerId)
                 return false;
-            if (IsAppproved != null)
+            if (IsApproved != null)
                 return false;
             return true;
         }
 
         public bool IsApprovable()
         {
-            if (IsAppproved == true)
+            if (IsApproved == true)
                 return false;
             return true;
         }
