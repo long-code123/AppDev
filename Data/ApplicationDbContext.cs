@@ -13,6 +13,9 @@ namespace AppDev.Data
 
         public DbSet<Category> Categories { get; set; } = null!;
 
+        public DbSet<RequestCategory> RequestCategories { get; set; } = null!;
+
+
         public DbSet<Book> Books { get; set; } = null!;
 
         public DbSet<Store> Stores { get; set; } = null!;
