@@ -15,13 +15,12 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.OrderItems)
+                   Book Title
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.OrderItems)
+                   Quantity
                 </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.OrderItems)
+                <th>Price
                 </th>
             </tr>
         </thead>
@@ -32,12 +31,13 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Book.Title)
                     </td>
+                     <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Price)
                     </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Quantity)
-                    </td>
+                   
                 </tr>
             }
         </tbody>
