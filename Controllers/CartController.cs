@@ -1,9 +1,9 @@
 ﻿using AppDev.Data;
 using AppDev.Models;
+using AppDev.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace AppDev.Controllers
@@ -77,9 +77,14 @@ namespace AppDev.Controllers
 
         public async Task<IActionResult> Checkout()
         {
+            var customer = await userManager.GetUserAsync(User);
+
+            if (customer == null)
+                return Unauthorized();
+
             var orders = await context.CartItems
                 .Include(ci => ci.Book)
-                .Where(ci => ci.CustomerId == CustomerId)
+                .Where(ci => ci.CustomerId == customer.Id)
                 .GroupBy(ci => ci.Book.StoreId)
                 .Select(g => new Order(CustomerId, g.Key, g.ToList()))
                 .ToListAsync();
@@ -91,19 +96,59 @@ namespace AppDev.Controllers
                 .FirstAsync(s => s.Id == order.StoreId);
             };
 
-            return View(orders);
+            var model = new CheckoutViewModel()
+            {
+                Orders = orders,
+                Name = customer.FullName,
+                Address = customer.HomeAddress,
+                PhoneNumber = customer.PhoneNumber,
+            };
+
+            return View(model);
         }
 
         [HttpPost, ActionName("Checkout")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CheckoutConfirm()
+        public async Task<IActionResult> CheckoutConfirm(CheckoutViewModel model)
         {
+            var customer = await userManager.GetUserAsync(User);
+            if (customer == null)
+                return Unauthorized();
+
+            List<Order> orders;
+            if (!ModelState.IsValid)
+            {
+                orders = await context.CartItems
+                    .Include(ci => ci.Book)
+                    .Where(ci => ci.CustomerId == customer.Id)
+                    .GroupBy(ci => ci.Book.StoreId)
+                    .Select(g => new Order(customer.Id, g.Key, g.ToList()))
+                    .ToListAsync();
+
+                foreach (var order in orders)
+                {
+                    order.Store = await context.Stores
+                    .AsNoTracking()
+                    .FirstAsync(s => s.Id == order.StoreId);
+                };
+
+                model.Orders = orders;
+
+                return View(model);
+            }
+
             var items = await context.CartItems
                 .Include(ci => ci.Book)
-                .Where(ci => ci.CustomerId == CustomerId)
+                .Where(ci => ci.CustomerId == customer.Id)
                 .ToListAsync();
 
-            var orders = items.GroupBy(ci => ci.Book.StoreId, (storeId, items) => new Order(CustomerId, storeId, items));
+            orders = items.GroupBy(ci => ci.Book.StoreId, (storeId, items) => new Order(customer.Id, storeId, items)
+            {
+                FullName = model.Name,
+                Address = model.Address,
+                PhoneNumber = model.PhoneNumber,
+            })
+                .ToList();
 
             context.CartItems.RemoveRange(items);
             context.AddRange(orders);
@@ -111,6 +156,32 @@ namespace AppDev.Controllers
             await context.SaveChangesAsync();
 
             return View("CheckoutSuccess");
+        }
+
+        public async Task<IActionResult> RemoveItem(int? bookId, int? quantity)
+        {
+            if (bookId == null || quantity <= 0)
+                return BadRequest();
+
+            var item = await context.CartItems
+                .FirstOrDefaultAsync(ci => ci.CustomerId == CustomerId && ci.BookId == bookId);
+
+            if (item == null)
+                return Ok();
+
+            if (quantity == null)
+            {
+                context.CartItems.Remove(item);
+            }
+            else
+            {
+                if (item.Quantity > quantity)
+                    item.Quantity -= quantity.Value;
+                else item.Quantity = 1;
+            }
+            await context.SaveChangesAsync();
+
+            return Ok(item);
         }
     }
 }
