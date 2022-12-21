@@ -1,0 +1,45 @@
+﻿@model IEnumerable<AppDev.Models.Order>
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<h1>Checkout</h1>
+<form method="post">
+    <input type="submit" value="Process" class="btn btn-primary" />
+</form>
+@foreach (var order in Model)
+{
+    <h4>@order.Store.Name</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.OrderItems)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OrderItems)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OrderItems)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in order.OrderItems)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Book.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
