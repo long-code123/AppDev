@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AppDev.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using AppDev.Data;
-using AppDev.Models;
 
 namespace AppDev.Controllers;
 
@@ -22,7 +16,9 @@ public class BooksController : Controller
     // GET: Books
     public async Task<IActionResult> Index()
     {
-        var applicationDbContext = _context.Books.Include(b => b.Category).Include(b => b.Store);
+        var applicationDbContext = _context.Books
+            .Include(b => b.Category)
+            .Include(b => b.Image);
         return View(await applicationDbContext.ToListAsync());
     }
 
@@ -37,6 +33,7 @@ public class BooksController : Controller
         var book = await _context.Books
             .Include(b => b.Category)
             .Include(b => b.Store)
+            .Include(b => b.Image)
             .FirstOrDefaultAsync(m => m.Id == id);
         if (book == null)
         {
