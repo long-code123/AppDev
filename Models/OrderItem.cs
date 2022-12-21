@@ -1,4 +1,6 @@
-﻿namespace AppDev.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace AppDev.Models
 {
     public class OrderItem
     {
@@ -10,6 +12,7 @@
 
         public int Quantity { get; set; }
 
+        [DataType(DataType.Currency)]
         public double Price { get; set; }
     }
 }
