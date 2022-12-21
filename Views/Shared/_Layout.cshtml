@@ -25,10 +25,10 @@
                         @if (User.IsInRole(Roles.StoreOwner))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="StoreOwner" asp-action="Index">Store</a>
+                                <a class="nav-link text-dark" asp-area="StoreOwner" asp-controller="Store" asp-action="Index">Store</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="StoreBooks" asp-action="Index">Store Books</a>
+                             <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="StoreOwner" asp-controller="Books" asp-action="Index">Store Books</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="StoreOwner" asp-controller="Orders" asp-action="Index">Orders</a>

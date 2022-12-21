@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using AppDev.Data;
+﻿using AppDev.Data;
+using AppDev.Helpers;
 using AppDev.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace AppDev.Controllers
+namespace AppDev.Areas.StoreOwner.Controllers
 {
-    public class StoreOwnerController : Controller
+    [Area("StoreOwner")]
+    [Authorize(Roles = Roles.StoreOwner)]
+    public class StoreController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> userManager;
@@ -27,7 +26,7 @@ namespace AppDev.Controllers
             }
         }
 
-        public StoreOwnerController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public StoreController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             this.userManager = userManager;

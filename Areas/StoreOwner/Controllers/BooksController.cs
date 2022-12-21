@@ -7,10 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace AppDev.Controllers
+namespace AppDev.Areas.StoreOwner.Controllers
 {
+    [Area("StoreOwner")]
     [Authorize(Roles = Roles.StoreOwner)]
-    public class StoreBooksController : Controller
+    public class BooksController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> userManager;
@@ -26,7 +27,7 @@ namespace AppDev.Controllers
             }
         }
 
-        public StoreBooksController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public BooksController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             this.userManager = userManager;
