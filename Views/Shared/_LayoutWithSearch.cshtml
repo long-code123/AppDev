@@ -1,0 +1,10 @@
+﻿@{
+    Layout = "_Layout";
+    IgnoreSection("Scripts");
+    SearchViewModel model = SearchViewModel.BookSearchViewModel;
+}
+@section Search {
+    <partial name="_SearchPartial" model="model" />
+}
+
+    @RenderBody()
