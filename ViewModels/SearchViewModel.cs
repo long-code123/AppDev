@@ -17,5 +17,10 @@
         {
             Action = "/Profile"
         };
+
+        public static SearchViewModel OrderSearchViewModel { get; } = new()
+        {
+            Action = "/StoreOwner/Orders"
+        };
     }
 }
