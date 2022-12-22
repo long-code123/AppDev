@@ -1,4 +1,5 @@
-﻿using AppDev.Data;
+﻿using AppDev.Areas.StoreOwner.ViewModels;
+using AppDev.Data;
 using AppDev.Helpers;
 using AppDev.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -7,10 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace AppDev.Controllers
+namespace AppDev.Areas.StoreOwner.Controllers
 {
+    [Area("StoreOwner")]
     [Authorize(Roles = Roles.StoreOwner)]
-    public class StoreBooksController : Controller
+    public class BooksController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> userManager;
@@ -26,7 +28,7 @@ namespace AppDev.Controllers
             }
         }
 
-        public StoreBooksController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public BooksController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             this.userManager = userManager;
@@ -50,6 +52,7 @@ namespace AppDev.Controllers
 
             var book = await _context.Books
                 .Include(b => b.Category)
+                .Include(b => b.Image)
                 .FirstOrDefaultAsync(b => b.Id == id && b.StoreId == StoreId);
 
             if (book == null)
@@ -64,7 +67,7 @@ namespace AppDev.Controllers
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
-            var model = new Book()
+            var model = new BookCreate()
             {
                 StoreId = StoreId,
             };
@@ -73,16 +76,33 @@ namespace AppDev.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Book book)
+        public async Task<IActionResult> Create(BookCreate model)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(book);
+                var extension = Path.GetExtension(model.UploadImage.FileName);
+                var book = new Book()
+                {
+                    Title = model.Title,
+                    Price = model.Price,
+                    StoreId = model.StoreId,
+                    CategoryId = model.CategoryId,
+                    Image = new(model.UploadImage.FileName, extension),
+                };
+                _context.Add(book);                
+
+                //var randomFileName = $"{Path.GetRandomFileName()}.{extension}";
+                //var imagePath = Path.Combine(FileUploadHelper.BookImageDirectory, randomFileName);
+                //var imageHref = Path.Combine(FileUploadHelper.BookImageHref, randomFileName);
+                using (var stream = new FileStream(book.Image.Path, FileMode.CreateNew))
+                {
+                    await model.UploadImage.CopyToAsync(stream);
+                }
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Id", book.CategoryId);
-            return View(book);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Id", model.CategoryId);
+            return View(model);
         }
 
         public async Task<IActionResult> Edit(int? id)
